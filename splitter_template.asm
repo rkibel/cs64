@@ -1,4 +1,25 @@
-disaggregate:
+.data
+# DO NOT CHANGE
+buffer: .word 0:100
+array: .word 9, 1, 2, 1, 17, 19, 10, 9, 11, 10
+newline: .asciiz "\n"
+comma: .asciiz ", "
+convention: .asciiz "Convention Check\n"
+depth: .asciiz "depth "
+colon: .asciiz ":"
+
+.text
+    main:
+        la $a0 array # the input array
+        li $a1 2 # depth: number of times you need to split an array
+        la $a2 buffer # the buffer array address
+        li $a3 10 # array length        
+
+        jal disaggregate
+
+        j exit
+    
+    disaggregate:
         addiu $sp, $sp, -32 # ?? = the negative of how many values we store in (stack * 4)
         sw $s0 0($sp)
         sw $s1 4($sp)
@@ -57,9 +78,9 @@ disaggregate:
             mflo $t6
             # find sum
             bge $t7, $t6, func_check # this is the loop exit condition
-            addu $s0 $t7
+            addu $s0 $s0 $t7
             lw $t6, 0($s0)
-            subu $s0 $t7
+            subu $s0 $s0 $t7
             
             # print array entry
             li $v0, 1
@@ -81,9 +102,9 @@ disaggregate:
             # We have two recursive conditions: depth == 0, arr_len == 1
             # They are OR'd in the C/C++ template
             # Do you need to OR them in MIPs too? 
-            beq $s1 $0 $ra
+            beq $s1 $0 function_end 
             li $t7 1
-            beq $s3 $t7 $ra
+            beq $s3 $t7 function_end
         # calculate the average 
         div $t2, $s3 # what register do we divide by? 
         mflo $t3 # avg 
@@ -186,3 +207,31 @@ disaggregate:
             addiu $sp, $sp, 32 # ?? = the positive of how many values we store in (stack * 4)
             # Load values after update if you have to
             jr $ra
+            
+    exit:
+        li $v0, 10
+        syscall
+
+ConventionCheck:  
+# DO NOT CHANGE AUTOGRADER USES THIS  
+    # reset all temporary values
+    addi    $t0, $0, -1
+    addi    $t1, $0, -1
+    addi    $t2, $0, -1
+    addi    $t3, $0, -1
+    addi    $t4, $0, -1
+    addi    $t5, $0, -1
+    addi    $t6, $0, -1
+    addi    $t7, $0, -1
+    ori     $v0, $0, 4
+    la      $a0, convention
+    syscall
+    addi    $v0, $zero, -1
+    addi    $v1, $zero, -1
+    addi    $a0, $zero, -1
+    addi    $a1, $zero, -1
+    addi    $a2, $zero, -1
+    addi    $a3, $zero, -1
+    addi    $k0, $zero, -1
+    addi    $k1, $zero, -1
+    jr      $ra
